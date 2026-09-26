@@ -1,0 +1,90 @@
+header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+
+#status {
+  min-height: 20px;
+  margin: 8px 0;
+  color: #536376;
+}
+
+#list {
+  display: grid;
+  gap: 5px;
+  margin: 10px 0 16px;
+}
+
+.item {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: white;
+  padding: 9px;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: #f1f5f9;
+}
+
+.item.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.item:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+
+.muted {
+  color: #64748b;
+}
+
+#columnPicker {
+  margin: 7px 0;
+}
+
+#columnPicker summary {
+  cursor: pointer;
+}
+
+#columnOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 15px;
+  padding: 10px 0 3px;
+}
+
+#columnOptions label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+#controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+button.control {
+  padding: 5px 9px;
+}
+
+audio {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+}

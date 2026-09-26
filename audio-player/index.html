@@ -1,10 +1,26 @@
 <!DOCTYPE html>
 <html>
-<body>
 
-<h1>My First Heading</h1>
-<p>My first paragraph.</p>
+<head>
+  <meta charset="utf-8">
+  <title>Audio Player</title>
 
-</body>
+  <link rel="stylesheet" href="player.css">
+</head>
+<header>
+  <h2>Audio queue</h2><span id="count" class="muted"></span>
+</header>
+<p id="status">Connecting to Grist…</p>
+<details id="columnPicker">
+  <summary>Columns shown</summary>
+  <div id="columnOptions"></div>
+</details>
+<div id="list"></div>
+<div id="controls">
+  <button class="control" id="retry" type="button">Retry access</button>
+  <button class="control" id="stop" type="button">Stop</button>
+  <button class="control" id="next" type="button">Next audio</button>
+</div>
+<audio id="player" controls preload="metadata"></audio>
+
 </html>
-
