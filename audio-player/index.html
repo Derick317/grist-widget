@@ -1,23 +1,35 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Audio Player</title>
-
   <link rel="stylesheet" href="player.css">
-
   <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   <script defer src="player.js"></script>
 </head>
-<header>
-  <h2>Audio queue</h2><span id="count" class="muted"></span>
-</header>
+<body>
+<header><h2>Audio queue</h2><span id="count" class="muted"></span></header>
 <p id="status">Connecting to Grist…</p>
-<details id="columnPicker">
-  <summary>Columns shown</summary>
-  <div id="columnOptions"></div>
-</details>
+<details id="columnPicker"><summary>Columns shown</summary><div id="columnOptions"></div></details>
+<nav class="pagination" aria-label="Audio list pages">
+  <label for="pageSize">Rows per page
+    <select id="pageSize">
+      <option value="10">10</option>
+      <option value="25" selected>25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+      <option value="200">200</option>
+    </select>
+  </label>
+  <span id="pageInfo" class="muted" aria-live="polite"></span>
+  <div class="page-buttons">
+    <button id="firstPage" type="button" aria-label="First page" disabled>First</button>
+    <button id="previousPage" type="button" aria-label="Previous page" disabled>Previous</button>
+    <button id="nextPage" type="button" aria-label="Next page" disabled>Next</button>
+    <button id="lastPage" type="button" aria-label="Last page" disabled>Last</button>
+  </div>
+</nav>
 <div id="list"></div>
 <div id="controls">
   <button class="control" id="retry" type="button">Retry access</button>
@@ -25,5 +37,6 @@
   <button class="control" id="next" type="button">Next audio</button>
 </div>
 <audio id="player" controls preload="metadata"></audio>
-
+</body>
 </html>
+
