@@ -88,3 +88,33 @@ audio {
   width: 100%;
   margin-top: 12px;
 }
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.pagination label {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.pagination select,
+.pagination button {
+  padding: 5px 8px;
+}
+
+.page-buttons {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.pagination button:disabled {
+  opacity: .5;
+  cursor: default;
+}
