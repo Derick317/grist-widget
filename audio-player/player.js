@@ -3,6 +3,12 @@ const statusEl = document.getElementById('status');
 const countEl = document.getElementById('count');
 const columnOptionsEl = document.getElementById('columnOptions');
 const player = document.getElementById('player');
+const pageSizeEl = document.getElementById('pageSize');
+const pageInfoEl = document.getElementById('pageInfo');
+const firstPageEl = document.getElementById('firstPage');
+const previousPageEl = document.getElementById('previousPage');
+const nextPageEl = document.getElementById('nextPage');
+const lastPageEl = document.getElementById('lastPage');
 statusEl.textContent = 'Starting Grist connection…';
 let rows = [];
 let queue = [];
@@ -13,6 +19,9 @@ let generation = 0;
 let gapTimer = null;
 let availableColumns = [];
 let visibleColumns = [];
+const PAGE_SIZES = [10, 25, 50, 100, 200];
+let pageSize = 25;
+let currentPage = 0;
 
 function cancelGap() {
   if (gapTimer !== null) clearTimeout(gapTimer);
@@ -75,10 +84,26 @@ function renderColumnPicker() {
   }
 }
 
+function showRowPage(rowId) {
+  const position = rows.findIndex(row => row.id === rowId);
+  if (position >= 0) currentPage = Math.floor(position / pageSize);
+}
+
 function render() {
   listEl.replaceChildren();
   countEl.textContent = `${rows.length} rows`;
-  for (const [position, row] of rows.entries()) {
+  const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
+  currentPage = Math.min(Math.max(0, currentPage), pageCount - 1);
+  const start = currentPage * pageSize;
+  const end = Math.min(start + pageSize, rows.length);
+  pageSizeEl.value = String(pageSize);
+  pageInfoEl.textContent = rows.length
+    ? `Rows ${start + 1}–${end} of ${rows.length} · Page ${currentPage + 1} of ${pageCount}`
+    : 'No rows';
+  firstPageEl.disabled = previousPageEl.disabled = currentPage === 0;
+  nextPageEl.disabled = lastPageEl.disabled = currentPage === pageCount - 1;
+  for (const [offset, row] of rows.slice(start, end).entries()) {
+    const position = start + offset;
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'item' + (queue[index]?.rowId === row.id ? ' active' : '');
@@ -90,6 +115,27 @@ function render() {
     listEl.append(button);
   }
 }
+
+// Page navigation changes only the displayed slice, not the playback queue.
+firstPageEl.addEventListener('click', () => { currentPage = 0; render(); });
+previousPageEl.addEventListener('click', () => { currentPage--; render(); });
+nextPageEl.addEventListener('click', () => { currentPage++; render(); });
+lastPageEl.addEventListener('click', () => {
+  currentPage = Math.max(0, Math.ceil(rows.length / pageSize) - 1);
+  render();
+});
+pageSizeEl.addEventListener('change', async () => {
+  const selected = Number(pageSizeEl.value);
+  if (!PAGE_SIZES.includes(selected)) return;
+  pageSize = selected;
+  currentPage = 0;
+  render();
+  try {
+    await grist.setOption('audioQueuePageSize', pageSize);
+  } catch (err) {
+    setStatus(`Could not save rows per page: ${err.message}`);
+  }
+});
 
 function stop() {
   generation++;
@@ -123,6 +169,7 @@ function startFrom(rowId) {
   // directly within the click handler. This satisfies browser audio policy.
   const item = queue[0];
   if (Date.now() < accessExpiresAt - 30000) {
+    showRowPage(item.rowId);
     player.src = attachmentUrl(item.id, access);
     render();
     setStatus(`Playing ${item.title} · audio ${item.number} of this row`);
@@ -144,6 +191,7 @@ async function playCurrent(run = generation) {
   try {
     const tokenInfo = await currentAccess();
     if (run !== generation) return;
+    showRowPage(item.rowId);
     player.src = attachmentUrl(item.id, tokenInfo);
     render();
     setStatus(`Playing ${item.title} · audio ${item.number} of this row`);
@@ -193,6 +241,12 @@ document.getElementById('retry').addEventListener('click', () => {
 
 grist.ready({ requiredAccess: 'full' });
 grist.onOptions((options, interaction) => {
+  const savedPageSize = options?.audioQueuePageSize;
+  if (PAGE_SIZES.includes(savedPageSize) && savedPageSize !== pageSize) {
+    pageSize = savedPageSize;
+    currentPage = 0;
+    render();
+  }
   if (Array.isArray(options?.audioQueueVisibleColumns)) {
     visibleColumns = options.audioQueueVisibleColumns;
     renderColumnPicker();
